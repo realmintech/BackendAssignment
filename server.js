@@ -42,20 +42,18 @@ app.put("/user/:id", (req, res) => {
   } else res.send("user not found");
 });
 
+app.delete("/:id", (req, res) => {
+  let deleteUser = users.find(function (user) {
+    return user.id == parseInt(req.params.id);
+  });
 
-app.delete('/:id', (req, res) =>{
-    let deleteUser = users.find(function(user){
-         return user.id == parseInt(req.params.id);
-    })
+  if (deleteUser) {
+    let Target = users.indexOf(deleteUser);
 
-    if (deleteUser) {
-
-        let Target = users.indexOf(deleteUser)
-
-        users.splice(Target, 1);
-        res.json(200, "user delete successfuly")
-    }else return("user not foung")
-})
+    users.splice(Target, 1);
+    res.json(200, "user delete successfuly");
+  } else return "user not foung";
+});
 app.listen(PORT, () => {
   console.log(`server running at ${PORT}`);
 });
