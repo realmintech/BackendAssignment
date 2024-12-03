@@ -3,9 +3,12 @@ const User = require("../model/user");
 const CreateUser = async (req, res) => {
   try {
     const newUser = new User({
-      name: req.body.name,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      username: req.body.username,
       email: req.body.email,
-      age: req.body.age,
+      gender: req.body.gender,
+      password: req.body.password,
     });
 
     await newUser.save();
@@ -22,8 +25,66 @@ const GetUser = async (req, res) => {
     res.json(200, users);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch users" }); // Corrected message
+    res.status(500).json({ error: "Failed to fetch users" });
   }
 };
 
-module.exports = { CreateUser, GetUser };
+const GetUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error, unable to find user" });
+  }
+};
+
+const UpdateUserDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedDetails = req.body;
+
+    const user = await User.findByIdAndUpdate(id, updatedDetails, {
+      new: true,
+      runValidators: true, 
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User updated successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error, unable to update user" });
+  }
+};
+
+const DeleteUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User deleted successfully", user: deletedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error, unable to delete user" });
+  }
+};
+
+module.exports = { CreateUser, GetUser, GetUserById, UpdateUserDetails, DeleteUserById };
